@@ -1,0 +1,48 @@
+package main
+
+import (
+	"fmt"
+	"os"
+
+	"github.com/csutorasa/terminal-ui/ansi"
+	"github.com/csutorasa/terminal-ui/application"
+	"github.com/csutorasa/terminal-ui/components"
+	"github.com/csutorasa/terminal-ui/document"
+	"github.com/csutorasa/terminal-ui/style"
+)
+
+func main() {
+	//c := components.NewDefaultCreator()
+	c := components.NewCreator(document.Default, style.DefaultTheme)
+	text := c.NewText()
+	text.SetText(ansi.NewFormattedText([]rune("hello\n"), ansi.FormatCodeGreenForeground).Concat(ansi.NewFormattedText([]rune("world\ntest"))))
+	text2 := c.NewText()
+	text2.SetText(c.Theme().CreateText([]rune("hello2\nworld\ntest")))
+	textInput := c.NewTextInput()
+	textInput2 := c.NewTextInput()
+	border2 := c.NewBorder()
+	border2.SetBorder(ansi.NewFormattedRune('X')).SetChild(text2.Element())
+	i := 0
+	button := c.NewButton().SetText("OK").SetOnAction(func() {
+		i++
+		text.SetText(ansi.NewFormattedText([]rune(fmt.Sprintf("%d", i))))
+	})
+	//scroll := c.NewScroll(textInput)
+	grid := c.NewGrid()
+	grid.
+		AddColumn(35).
+		AddColumnOfRatio(1).
+		AddRow(2).
+		AddRowOfRatio(1).
+		AddRowOfRatio(1).
+		AddChildren(text.Element(), textInput.Element(), border2.Element(), textInput2.Element(), button.Element(), text.Element())
+	border := c.NewBorder()
+	border.SetChild(grid.Element())
+	c.SetRoot(border.Element())
+	app := application.New(c.Document())
+	app.Document().SetFocus(textInput.Element())
+	err := app.Run(application.NewTerminalDecoder(os.Stdin), application.NewTerminalRenderer(os.Stderr))
+	if err != nil {
+		panic(err)
+	}
+}
