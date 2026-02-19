@@ -8,6 +8,9 @@ on:
     branches:
       - main
 
+env:
+  goVersion: "1.25"
+
 jobs:
   build:
     strategy:
