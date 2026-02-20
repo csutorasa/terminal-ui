@@ -6,7 +6,7 @@ import (
 
 // Interface for storing state and tracking changes.
 type State interface {
-	changed() bool
+	Changed() bool
 	resetChanged()
 }
 
@@ -30,11 +30,11 @@ func (ms *MultiState) Append(s State) {
 	ms.states = append(ms.states, s)
 }
 
-func (ms *MultiState) changed() bool {
+func (ms *MultiState) Changed() bool {
 	ms.mutex.RLock()
 	defer ms.mutex.RUnlock()
 	for _, c := range ms.states {
-		if c.changed() {
+		if c.Changed() {
 			return true
 		}
 	}

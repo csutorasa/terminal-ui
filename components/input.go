@@ -14,7 +14,7 @@ type Input struct {
 	cursor      *document.Property[int]
 	foreground  *document.Property[ansi.FormatCode]
 	background  *document.Property[ansi.FormatCode]
-	cursorColor *document.Property[[]ansi.FormatCode]
+	cursorColor *document.UniqueSliceProperty[ansi.FormatCode]
 }
 
 func NewInput(element *document.Element) *Input {
@@ -24,7 +24,7 @@ func NewInput(element *document.Element) *Input {
 		str:         document.AppendState(element, document.NewSliceProperty([]rune{})),
 		foreground:  document.AppendState(element, document.NewProperty(ansi.FormatCodeDefaultForeground)),
 		background:  document.AppendState(element, document.NewProperty(ansi.FormatCodeDefaultBackground)),
-		cursorColor: document.AppendState(element, document.NewSliceProperty([]ansi.FormatCode{ansi.FormatCodeGreenBackground})),
+		cursorColor: document.AppendState(element, document.NewUniqueSliceProperty([]ansi.FormatCode{ansi.FormatCodeGreenBackground})),
 	}
 }
 

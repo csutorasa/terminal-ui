@@ -42,8 +42,8 @@ func (ep *ElementProperties) Focused() bool {
 	return ep.focus.Value()
 }
 
-func (ep *ElementProperties) changed() bool {
-	return ep.state.changed()
+func (ep *ElementProperties) Changed() bool {
+	return ep.state.Changed()
 }
 
 func (ep *ElementProperties) resetChanged() {
@@ -64,7 +64,7 @@ func NewComponent[T Component](document *Document, creator func(element *Element
 	element := &Element{
 		document: document,
 	}
-	children := NewUniqueSlicePropertyOnChange(func(e *Element) {
+	children := NewUniqueSlicePropertyOnChange([]*Element{}, func(e *Element) {
 		document.addChild(element, e)
 	}, func(e *Element) {
 		document.removeChild(element, e)
@@ -100,7 +100,7 @@ func (e *Element) render() bool {
 			childrenChanged = true
 		}
 	}
-	shouldRender := e.cachedOutput == nil || e.properties.changed() || childrenChanged
+	shouldRender := e.cachedOutput == nil || e.properties.Changed() || childrenChanged
 	if !shouldRender {
 		return false
 	}
