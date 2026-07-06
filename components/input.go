@@ -2,6 +2,7 @@ package components
 
 import (
 	"slices"
+	"unicode"
 
 	"github.com/csutorasa/terminal-ui/ansi"
 	"github.com/csutorasa/terminal-ui/document"
@@ -171,15 +172,12 @@ func startOfPreviousWordIndex(str []rune, currentIndex int) int {
 	newVal := currentIndex - 1
 	foundRune := false
 	for i := newVal; i >= 0; i-- {
-		if isWordRune(str[i]) {
+		if isLetter(str[i]) {
 			newVal = i
 			foundRune = true
 		} else if foundRune {
 			break
 		}
-	}
-	if newVal == currentIndex-1 {
-		return 0
 	}
 	return newVal
 }
@@ -191,7 +189,7 @@ func startOfNextWordIndex(str []rune, currentIndex int) int {
 	foundOther := false
 	newVal := currentIndex
 	for i := currentIndex; i < len(str); i++ {
-		if isWordRune(str[i]) {
+		if isLetter(str[i]) {
 			if foundOther {
 				newVal = i
 				break
@@ -206,15 +204,6 @@ func startOfNextWordIndex(str []rune, currentIndex int) int {
 	return newVal
 }
 
-func isWordRune(r rune) bool {
-	if 'a' <= r && r <= 'z' {
-		return true
-	}
-	if 'A' <= r && r <= 'Z' {
-		return true
-	}
-	if '0' <= r && r <= '9' {
-		return true
-	}
-	return false
+func isLetter(r rune) bool {
+	return unicode.IsLetter(r)
 }
