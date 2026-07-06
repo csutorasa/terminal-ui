@@ -9,17 +9,17 @@ import (
 type EqualsFunc[T any] = func(T, T) bool
 
 // Func to handle changes in value.
-type OnChangeFunc[T any] = func(old T, new T)
+type OnPropertyChangeFunc[T any] = func(old T, new T)
 
 // Func to handle changes in slice values.
-type OnItemChangeFunc[T any] = func(T)
+type OnPropertyItemChangeFunc[T any] = func(T)
 
 // State for storing a property.
 type Property[T any] struct {
 	change   bool
 	value    T
 	equals   EqualsFunc[T]
-	onChange OnChangeFunc[T]
+	onChange OnPropertyChangeFunc[T]
 	mutex    sync.RWMutex
 }
 
@@ -36,14 +36,14 @@ func NewPropertyFunc[T any](initial T, equals EqualsFunc[T]) *Property[T] {
 }
 
 // Creates a new property with custom on change handler.
-func NewPropertyOnChange[T comparable](initial T, onChange OnChangeFunc[T]) *Property[T] {
+func NewPropertyOnChange[T comparable](initial T, onChange OnPropertyChangeFunc[T]) *Property[T] {
 	return NewPropertyFuncOnChange(initial, func(a T, b T) bool {
 		return a == b
 	}, onChange)
 }
 
 // Creates a new property with custom equals function and on change handler.
-func NewPropertyFuncOnChange[T any](initial T, equals EqualsFunc[T], onChange OnChangeFunc[T]) *Property[T] {
+func NewPropertyFuncOnChange[T any](initial T, equals EqualsFunc[T], onChange OnPropertyChangeFunc[T]) *Property[T] {
 	return &Property[T]{
 		change:   true,
 		value:    initial,
@@ -67,14 +67,14 @@ func NewSlicePropertyFunc[T any, S ~[]T](initial S, equals EqualsFunc[T]) *Prope
 }
 
 // Creates a new property with custom on change handler.
-func NewSlicePropertyOnChange[T comparable, S ~[]T](initial S, onChange OnChangeFunc[[]T]) *Property[[]T] {
+func NewSlicePropertyOnChange[T comparable, S ~[]T](initial S, onChange OnPropertyChangeFunc[[]T]) *Property[[]T] {
 	return NewPropertyFuncOnChange[[]T](initial, func(a []T, b []T) bool {
 		return slices.Equal(a, b)
 	}, onChange)
 }
 
 // Creates a new property with custom equals function and on change handler.
-func NewSlicePropertyFuncOnChange[T any, S ~[]T](initial S, equals EqualsFunc[T], onChange OnChangeFunc[[]T]) *Property[[]T] {
+func NewSlicePropertyFuncOnChange[T any, S ~[]T](initial S, equals EqualsFunc[T], onChange OnPropertyChangeFunc[[]T]) *Property[[]T] {
 	return NewPropertyFuncOnChange[[]T](initial, func(a []T, b []T) bool {
 		return slices.EqualFunc(a, b, equals)
 	}, onChange)
@@ -125,8 +125,8 @@ type UniqueSliceProperty[T any] struct {
 	change   bool
 	value    []T
 	equals   EqualsFunc[T]
-	onAdd    OnItemChangeFunc[T]
-	onRemove OnItemChangeFunc[T]
+	onAdd    OnPropertyItemChangeFunc[T]
+	onRemove OnPropertyItemChangeFunc[T]
 	mutex    sync.RWMutex
 }
 
@@ -253,14 +253,14 @@ func NewUniqueSlicePropertyFunc[T any, S ~[]T](initial S, equals EqualsFunc[T]) 
 }
 
 // Creates a new unique slice property.
-func NewUniqueSlicePropertyOnChange[T comparable, S ~[]T](initial S, add OnItemChangeFunc[T], remove OnItemChangeFunc[T]) *UniqueSliceProperty[T] {
+func NewUniqueSlicePropertyOnChange[T comparable, S ~[]T](initial S, add OnPropertyItemChangeFunc[T], remove OnPropertyItemChangeFunc[T]) *UniqueSliceProperty[T] {
 	return NewUniqueSlicePropertyFuncOnChange(initial, func(a T, b T) bool {
 		return a == b
 	}, add, remove)
 }
 
 // Creates a new unique slice property.
-func NewUniqueSlicePropertyFuncOnChange[T any, S ~[]T](initial S, equals EqualsFunc[T], add OnItemChangeFunc[T], remove OnItemChangeFunc[T]) *UniqueSliceProperty[T] {
+func NewUniqueSlicePropertyFuncOnChange[T any, S ~[]T](initial S, equals EqualsFunc[T], add OnPropertyItemChangeFunc[T], remove OnPropertyItemChangeFunc[T]) *UniqueSliceProperty[T] {
 	return &UniqueSliceProperty[T]{
 		change:   true,
 		value:    initial,
