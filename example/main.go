@@ -36,7 +36,7 @@ func main() {
 		AddRowOfRatio(1).
 		AddRowOfRatio(1).
 		AddChildren(text.Element(), textInput.Element(), border2.Element(), textInput2.Element(), button.Element(), text.Element())
-	border := c.NewBorder()
+	border := c.NewBorder().SetThickness(2)
 	border.SetChild(grid.Element())
 	c.SetRoot(border.Element())
 	app := application.New(c.Document())

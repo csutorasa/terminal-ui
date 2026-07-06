@@ -8,14 +8,16 @@ import (
 
 type Border struct {
 	*WrapperComponent
-	border     *document.Property[ansi.FormattedRune]
 	background *document.Property[ansi.FormatCode]
+	border     *document.Property[ansi.FormattedRune]
+	thickness  *document.Property[int]
 }
 
 func NewBorder(element *document.Element) *Border {
 	return &Border{
 		WrapperComponent: NewWrapperComponent(element),
 		border:           document.AppendState(element, document.NewPropertyFunc(ansi.NewFormattedRune('*'), ansi.FormattedRuneEquals)),
+		thickness:        document.AppendState(element, document.NewProperty(1)),
 		background:       document.AppendState(element, document.NewProperty(ansi.FormatCodeDefaultBackground)),
 	}
 }
@@ -39,6 +41,14 @@ func (b *Border) SetBackground(background ansi.FormatCode) *Border {
 	return b
 }
 
+func (b *Border) SetThickness(thickness int) *Border {
+	if thickness < 1 {
+		panic("thickness must be positive")
+	}
+	b.thickness.Set(thickness)
+	return b
+}
+
 func (b *Border) Focusable() bool {
 	return false
 }
@@ -49,33 +59,34 @@ func (b *Border) Render(c *document.RenderWriter) {
 		return
 	}
 	border := b.border.Value()
-	if w < 3 {
-		for range h {
-			c.WriteLineFormattedString(border.Repeat(w))
-		}
-		return
-	}
-	if h < 3 {
+	thickness := b.thickness.Value()
+	if w <= 2*thickness || h <= 2*thickness {
 		for range h {
 			c.WriteLineFormattedString(border.Repeat(w))
 		}
 		return
 	}
 	cc := b.Child().RenderFill(ansi.NewFormattedRune(' ', b.background.Value()))
-	c.WriteLineFormattedString(border.Repeat(w))
-	for line := range cc.Lines() {
-		c.WriteLineFormattedText(border.ToText().Concat(line).Concat(border.ToText()))
+	for range thickness {
+		c.WriteLineFormattedString(border.Repeat(w))
 	}
-	c.WriteLineFormattedString(border.Repeat(w))
+	for line := range cc.Lines() {
+		b := border.Repeat(thickness).ToText()
+		c.WriteLineFormattedText(b.Concat(line).Concat(b))
+	}
+	for range thickness {
+		c.WriteLineFormattedString(border.Repeat(w))
+	}
 }
 
 func (b *Border) Layout(c document.LayoutContext) {
 	w, h := c.Size()
-	if w < 3 || h < 3 {
+	thickness := b.thickness.Value()
+	if w <= 2*thickness || h <= 2*thickness {
 		c.Add(b.Child(), document.NewEmptyRenderContext())
 		return
 	}
-	c.Add(b.Child(), document.NewRenderContext(w-2, h-2))
+	c.Add(b.Child(), document.NewRenderContext(w-2*thickness, h-2*thickness))
 }
 
 func (b *Border) OnEvent(e *document.Event) {
