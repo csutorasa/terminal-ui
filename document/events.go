@@ -14,3 +14,7 @@ type OnFocusLostEvent struct {
 type KeyboardEvent struct {
 	Key ansi.Key
 }
+
+// Triggered when a dispatch is requested.
+type DispatchEvent struct {
+}

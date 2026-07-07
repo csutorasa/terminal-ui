@@ -65,9 +65,9 @@ func NewComponent[T Component](document *Document, creator func(element *Element
 		document: document,
 	}
 	children := NewUniqueSlicePropertyOnChange([]*Element{}, func(e *Element) {
-		document.addChild(element, e)
+		document.dom.addChild(element, e)
 	}, func(e *Element) {
-		document.removeChild(element, e)
+		document.dom.removeChild(element, e)
 	})
 	elementProperty := newElementProperties(children)
 	element.properties = elementProperty

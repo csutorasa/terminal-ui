@@ -97,7 +97,5 @@ func (a *Application) Render() error {
 	if a.renderer == nil {
 		return fmt.Errorf("application is not running")
 	}
-	return a.renderer.Render(func(rc document.RenderContext) (document.RenderOutput, bool) {
-		return a.document.Render(rc)
-	})
+	return a.renderer.Render(a.document.Render)
 }
