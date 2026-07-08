@@ -10,7 +10,7 @@ import (
 )
 
 type Input struct {
-	*Component
+	*SimpleComponent
 	str         *document.Property[[]rune]
 	cursor      *document.Property[int]
 	foreground  *document.Property[ansi.FormatCode]
@@ -20,12 +20,12 @@ type Input struct {
 
 func NewInput(element *document.Element) *Input {
 	return &Input{
-		Component:   NewComponent(element),
-		cursor:      document.AppendState(element, document.NewProperty(0)),
-		str:         document.AppendState(element, document.NewSliceProperty([]rune{})),
-		foreground:  document.AppendState(element, document.NewProperty(ansi.FormatCodeDefaultForeground)),
-		background:  document.AppendState(element, document.NewProperty(ansi.FormatCodeDefaultBackground)),
-		cursorColor: document.AppendState(element, document.NewUniqueSliceProperty([]ansi.FormatCode{ansi.FormatCodeGreenBackground})),
+		SimpleComponent: NewSimpleComponent(element),
+		cursor:          document.AppendState(element, document.NewProperty(0)),
+		str:             document.AppendState(element, document.NewSliceProperty([]rune{})),
+		foreground:      document.AppendState(element, document.NewProperty(ansi.FormatCodeDefaultForeground)),
+		background:      document.AppendState(element, document.NewProperty(ansi.FormatCodeDefaultBackground)),
+		cursorColor:     document.AppendState(element, document.NewUniqueSliceProperty([]ansi.FormatCode{ansi.FormatCodeGreenBackground})),
 	}
 }
 

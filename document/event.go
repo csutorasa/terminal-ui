@@ -6,7 +6,7 @@ type Event struct {
 	event     any
 }
 
-// Creates a new event.
+// Creates a new [Event].
 func NewEvent(e any) *Event {
 	return &Event{
 		event: e,
@@ -18,6 +18,11 @@ func (e *Event) StopPropagation() {
 	e.propagate = true
 }
 
+// Gets the [Event]'s raw data.
 func (e *Event) Event() any {
 	return e.event
+}
+
+func (e *Event) propagating() bool {
+	return e.propagate
 }

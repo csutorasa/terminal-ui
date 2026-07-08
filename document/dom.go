@@ -14,7 +14,7 @@ type Dom struct {
 	mutex    sync.RWMutex
 }
 
-// Creates a new document.
+// Creates a new [Dom].
 func NewDom(document *Document) *Dom {
 	return &Dom{
 		document: document,
@@ -23,7 +23,7 @@ func NewDom(document *Document) *Dom {
 	}
 }
 
-// Sets the document root.
+// Sets the [Dom] root.
 func (d *Dom) SetRoot(root *Element) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
@@ -31,7 +31,7 @@ func (d *Dom) SetRoot(root *Element) {
 	d.focus = nil
 }
 
-// Gets the document root.
+// Gets the [Dom] root.
 func (d *Dom) Root() *Element {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
@@ -50,6 +50,7 @@ func (d *Dom) SetFocus(element *Element) {
 	d.setFocus(element)
 }
 
+// Cycles the focus to the next [Element].
 func (d *Dom) FocusNext() {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
@@ -94,6 +95,10 @@ func (d *Dom) removeChild(parent *Element, child *Element) {
 		panic(ErrCorruptDom)
 	}
 	delete(d.parents, child)
+	if d.focus == child {
+		d.focus = nil
+		d.FocusNext()
+	}
 }
 
 func (d *Dom) validateDocument(element *Element) {

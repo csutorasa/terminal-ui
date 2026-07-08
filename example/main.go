@@ -21,7 +21,7 @@ func main() {
 	textInput := c.NewTextInput()
 	textInput2 := c.NewTextInput()
 	border2 := c.NewBorder()
-	border2.SetBorder(ansi.NewFormattedRune('X')).SetChild(text2.Element())
+	border2.SetBorder(ansi.NewFormattedRune('X')).SetChild(text2)
 	i := 0
 	button := c.NewButton().SetText("OK").SetOnAction(func() {
 		i++
@@ -35,12 +35,12 @@ func main() {
 		AddRow(2).
 		AddRowOfRatio(1).
 		AddRowOfRatio(1).
-		AddChildren(text.Element(), textInput.Element(), border2.Element(), textInput2.Element(), button.Element(), text.Element())
+		AddChildren(text, textInput, border2, textInput2, button, text)
 	border := c.NewBorder().SetThickness(2)
-	border.SetChild(grid.Element())
-	c.SetRoot(border.Element())
+	border.SetChild(grid)
+	c.SetRoot(border)
 	app := application.New(c.Document())
-	app.Document().SetFocus(textInput.Element())
+	app.Document().FocusNext()
 	err := app.Run(application.NewTerminalDecoder(os.Stdin), application.NewTerminalRenderer(os.Stderr))
 	if err != nil {
 		panic(err)

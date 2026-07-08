@@ -23,6 +23,6 @@ func TestDispatcher(t *testing.T) {
 	}
 	dispatcher.Run()
 	if calledTimes != 2 {
-		t.Fatal("2 call is expected")
+		t.Fatal("2 calls are expected")
 	}
 }

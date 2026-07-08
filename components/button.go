@@ -11,7 +11,7 @@ import (
 type ButtonActionHandler = func()
 
 type Button struct {
-	*Component
+	*SimpleComponent
 	keyBinding  ButtonKeyBinding
 	text        *document.Property[string]
 	foreground  *document.Property[ansi.FormatCode]
@@ -22,12 +22,12 @@ type Button struct {
 
 func NewButton(element *document.Element) *Button {
 	return &Button{
-		Component:   NewComponent(element),
-		keyBinding:  DefaultButtonKeyBinding,
-		text:        document.AppendState(element, document.NewProperty("")),
-		foreground:  document.AppendState(element, document.NewProperty(ansi.FormatCodeDefaultForeground)),
-		background:  document.AppendState(element, document.NewProperty(ansi.FormatCodeDefaultBackground)),
-		cursorColor: document.AppendState(element, document.NewUniqueSliceProperty([]ansi.FormatCode{ansi.FormatCodeGreenBackground})),
+		SimpleComponent: NewSimpleComponent(element),
+		keyBinding:      DefaultButtonKeyBinding,
+		text:            document.AppendState(element, document.NewProperty("")),
+		foreground:      document.AppendState(element, document.NewProperty(ansi.FormatCodeDefaultForeground)),
+		background:      document.AppendState(element, document.NewProperty(ansi.FormatCodeDefaultBackground)),
+		cursorColor:     document.AppendState(element, document.NewUniqueSliceProperty([]ansi.FormatCode{ansi.FormatCodeGreenBackground})),
 	}
 }
 

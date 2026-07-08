@@ -2,19 +2,23 @@ package document
 
 import "sync"
 
+// Dispatcher callback function.
 type DispatcherCallback func()
 
+// Dispatcher allows to execute callbacks after the event processing is done.
 type Dispatcher struct {
 	callbacks []DispatcherCallback
 	mutex     sync.Mutex
 }
 
+// Creates a new [Dispatcher].
 func NewDispatcher() *Dispatcher {
 	return &Dispatcher{
 		callbacks: []DispatcherCallback{},
 	}
 }
 
+// Adds a new callback to the queue.
 func (d *Dispatcher) Dispatch(callback DispatcherCallback) {
 	if callback == nil {
 		panic("callback is nil")
@@ -24,6 +28,7 @@ func (d *Dispatcher) Dispatch(callback DispatcherCallback) {
 	d.callbacks = append(d.callbacks, callback)
 }
 
+// Executes all callbacks in the queue.
 func (d *Dispatcher) Run() {
 	for {
 		callback := d.findFirst()

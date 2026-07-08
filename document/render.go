@@ -7,7 +7,7 @@ import (
 	"github.com/csutorasa/terminal-ui/ansi"
 )
 
-// Formatted output
+// Formatted output, each element of the slice is a line of output
 type RenderOutput []ansi.FormattedText
 
 // Gets the [RenderOutput] lines.
@@ -23,17 +23,18 @@ func (ro RenderOutput) Lines() iter.Seq[ansi.FormattedText] {
 
 // Fills the output to the expected size with the padding.
 func (ro RenderOutput) Fill(rc RenderContext, padding ansi.FormattedRune) RenderOutput {
-	if rc.h == math.MaxInt || rc.w == math.MaxInt {
+	w, h := rc.Size()
+	if h == math.MaxInt || w == math.MaxInt {
 		panic("cannot fill infinite render context")
 	}
 	rw := NewRenderWriterFromOutput(rc, ro)
 	for i, line := range rw.lines {
 		l := line.Len()
-		if l < rw.w {
-			rw.lines[i] = line.PadRight(rw.w, padding)
+		if l < w {
+			rw.lines[i] = line.PadRight(w, padding)
 		}
 	}
-	s := padding.Repeat(rw.w)
+	s := padding.Repeat(w)
 	for {
 		if !rw.WriteLineFormattedString(s) {
 			return rw.lines
@@ -59,42 +60,43 @@ func NewRenderWriterFromOutput(rc RenderContext, ro RenderOutput) *RenderWriter 
 
 // Writes runes to the output.
 // Returns if the context can accept more lines.
-func (w *RenderWriter) WriteLineRunes(line []rune) bool {
-	return w.WriteLineFormattedString(ansi.NewFormattedString(line))
+func (rw *RenderWriter) WriteLineRunes(line []rune) bool {
+	return rw.WriteLineFormattedString(ansi.NewFormattedString(line))
 }
 
 // Writes [ansi.FormattedString] to the output.
 // Returns if the context can accept more lines.
-func (w *RenderWriter) WriteLineFormattedString(line ansi.FormattedString) bool {
-	return w.WriteLineFormattedText(ansi.FormattedText{line})
+func (rw *RenderWriter) WriteLineFormattedString(line ansi.FormattedString) bool {
+	return rw.WriteLineFormattedText(ansi.FormattedText{line})
 }
 
 // Writes [ansi.FormattedText] to the output.
 // Returns if the context can accept more lines.
-func (w *RenderWriter) WriteLineFormattedText(line ansi.FormattedText) bool {
-	if len(w.lines) >= w.h {
+func (rw *RenderWriter) WriteLineFormattedText(line ansi.FormattedText) bool {
+	w, h := rw.Size()
+	if len(rw.lines) >= h {
 		return false
 	}
-	if line.Len() > w.w {
-		line = line.SubStr(0, w.w)
+	if line.Len() > w {
+		line = line.SubStr(0, w)
 	}
-	w.lines = append(w.lines, line)
-	return len(w.lines) < w.h
+	rw.lines = append(rw.lines, line)
+	return len(rw.lines) < h
 }
 
 // Writes count number of empty lines.
 // Returns if the context can accept more lines.
-func (w *RenderWriter) WriteLineEmpty(count int) bool {
+func (rw *RenderWriter) WriteLineEmpty(count int) bool {
 	for range count {
-		if !w.WriteLineRunes([]rune{}) {
+		if !rw.WriteLineRunes([]rune{}) {
 			return false
 		}
 	}
 	return true
 }
 
-func render(rc RenderContext, component Component) RenderOutput {
+func render(rc RenderContext, c Component) RenderOutput {
 	rw := NewRenderWriter(rc)
-	component.Render(rw)
+	c.Render(rw)
 	return rw.lines
 }

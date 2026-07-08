@@ -50,7 +50,7 @@ func (d *Document) Render(rc RenderContext) (RenderOutput, bool) {
 	defer d.dom.mutex.Unlock()
 	root := d.dom.validateHasRoot()
 	layoutContext := NewLayoutContext(rc)
-	layoutContext.Add(root, rc)
+	layoutContext.add(root, rc)
 	root.renderLayout(layoutContext)
 	layoutContext.apply()
 	changed := root.render()
@@ -65,6 +65,11 @@ func (d *Document) SetRoot(root *Element) {
 // Sets the focus to an element.
 func (d *Document) SetFocus(element *Element) {
 	d.dom.SetFocus(element)
+}
+
+// Cycles the focus to the next [Element].
+func (d *Document) FocusNext() {
+	d.dom.FocusNext()
 }
 
 func (d *Document) triggerEvent(event *Event) {
@@ -83,7 +88,7 @@ func (d *Document) propagateEvent(element *Element, event *Event) {
 	parents := d.dom.findParents(element)
 	for _, e := range parents {
 		e.onEvent(event)
-		if !event.propagate {
+		if !event.propagating() {
 			return
 		}
 	}

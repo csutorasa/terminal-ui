@@ -62,6 +62,11 @@ const (
 	FormatCodeBrightWhiteBackground   FormatCode = "107"
 )
 
+func FormatSequence(formatCodes ...FormatCode) EscapeSequence {
+	//slices.Sort(formatCodes)
+	return NewEscapeSequence(CommandFormat, formatCodes...)
+}
+
 func FormatCodesEquals(a []FormatCode, b []FormatCode) bool {
 	if len(a) != len(b) {
 		return false

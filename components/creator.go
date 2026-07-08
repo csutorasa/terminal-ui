@@ -26,8 +26,8 @@ func NewDefaultCreator() *Creator {
 }
 
 // Sets the document root.
-func (c *Creator) SetRoot(root *document.Element) {
-	c.d.SetRoot(root)
+func (c *Creator) SetRoot(root Component) {
+	c.d.SetRoot(root.Element())
 }
 
 // Gets the document.

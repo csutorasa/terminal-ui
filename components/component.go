@@ -13,6 +13,12 @@ type ApplyThemer interface {
 	ApplyTheme(*style.Theme)
 }
 
+type Component interface {
+	document.Component
+	Element() *document.Element
+	Focused() bool
+}
+
 // Base struct for a component.
 type ComponentBase struct {
 	element *document.Element
@@ -34,19 +40,19 @@ func (c *ComponentBase) Focused() bool {
 	return c.element.Properties().Focused()
 }
 
-// Component with no children.
-type Component struct {
+// SimpleComponent with no children.
+type SimpleComponent struct {
 	*ComponentBase
 }
 
-func NewComponent(element *document.Element) *Component {
-	return &Component{
+func NewSimpleComponent(element *document.Element) *SimpleComponent {
+	return &SimpleComponent{
 		ComponentBase: NewComponentBase(element),
 	}
 }
 
 // Defaults to empty Layout, as it has no children.
-func (c *Component) Layout(rc document.LayoutContext) {
+func (c *SimpleComponent) Layout(rc document.LayoutContext) {
 
 }
 
@@ -71,11 +77,11 @@ func (wc *WrapperComponent) Child() *document.Element {
 }
 
 // Sets the child.
-func (wc *WrapperComponent) SetChild(e *document.Element) {
+func (wc *WrapperComponent) SetChild(e Component) {
 	children := wc.element.Properties().Children()
 	children.RemoveAll()
 	if e != nil {
-		children.Add(e)
+		children.Add(e.Element())
 	}
 }
 
@@ -91,13 +97,13 @@ func NewContainerComponent(element *document.Element) *ContainerComponent {
 }
 
 // Adds children.
-func (cc *ContainerComponent) AddChildren(elements ...*document.Element) {
-	cc.element.Properties().Children().Add(elements...)
+func (cc *ContainerComponent) AddChildren(components ...Component) {
+	cc.element.Properties().Children().Add(componentsToElements(components)...)
 }
 
 // Removes children.
-func (cc *ContainerComponent) RemoveChildren(elements ...*document.Element) {
-	cc.element.Properties().Children().Remove(elements...)
+func (cc *ContainerComponent) RemoveChildren(components ...Component) {
+	cc.element.Properties().Children().Remove(componentsToElements(components)...)
 }
 
 // Gets the children.
@@ -109,4 +115,12 @@ func (cc *ContainerComponent) Children() iter.Seq[*document.Element] {
 			}
 		}
 	}
+}
+
+func componentsToElements(components []Component) []*document.Element {
+	elements := make([]*document.Element, len(components))
+	for i, component := range components {
+		elements[i] = component.Element()
+	}
+	return elements
 }

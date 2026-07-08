@@ -6,14 +6,14 @@ import (
 )
 
 type Text struct {
-	*Component
+	*SimpleComponent
 	text *document.Property[ansi.FormattedText]
 }
 
 func NewText(element *document.Element) *Text {
 	return &Text{
-		Component: NewComponent(element),
-		text:      document.AppendState(element, document.NewPropertyFunc(ansi.FormattedText{}, ansi.FormattedTextEquals)),
+		SimpleComponent: NewSimpleComponent(element),
+		text:            document.AppendState(element, document.NewPropertyFunc(ansi.FormattedText{}, ansi.FormattedTextEquals)),
 	}
 }
 

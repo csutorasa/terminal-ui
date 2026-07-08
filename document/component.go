@@ -1,6 +1,7 @@
 package document
 
 // Base interface for a component.
+// This interface is used by the document package to communicate to the custom components.
 type Component interface {
 	// Handles the event.
 	OnEvent(e *Event)

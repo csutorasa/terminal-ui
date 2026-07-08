@@ -6,30 +6,32 @@ import (
 
 // Interface for storing state and tracking changes.
 type State interface {
+	// Gets if the stored state has changed.
 	Changed() bool
 	resetChanged()
 }
 
-// Combines multiple states into one.
+// Combines multiple [State]s into one.
 type MultiState struct {
 	states []State
 	mutex  sync.RWMutex
 }
 
-// Creates a new multi state.
+// Creates a new [MultiState].
 func NewMultiState() *MultiState {
 	return &MultiState{
 		states: []State{},
 	}
 }
 
-// Adds a new state.
+// Adds a new [State].
 func (ms *MultiState) Append(s State) {
 	ms.mutex.Lock()
 	defer ms.mutex.Unlock()
 	ms.states = append(ms.states, s)
 }
 
+// Implements [State].
 func (ms *MultiState) Changed() bool {
 	ms.mutex.RLock()
 	defer ms.mutex.RUnlock()
@@ -41,6 +43,7 @@ func (ms *MultiState) Changed() bool {
 	return false
 }
 
+// Implements [State].
 func (ms *MultiState) resetChanged() {
 	ms.mutex.Lock()
 	defer ms.mutex.Unlock()
@@ -49,7 +52,7 @@ func (ms *MultiState) resetChanged() {
 	}
 }
 
-// Appends a new state to the multi state and returns it.
+// Appends a new [State] to the [MultiState] and returns the state.
 func appendState[S State](ms *MultiState, s S) S {
 	ms.Append(s)
 	return s
