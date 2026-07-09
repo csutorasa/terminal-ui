@@ -61,7 +61,7 @@ func NewRenderWriterFromOutput(rc RenderContext, ro RenderOutput) *RenderWriter 
 // Writes runes to the output.
 // Returns if the context can accept more lines.
 func (rw *RenderWriter) WriteLineRunes(line []rune) bool {
-	return rw.WriteLineFormattedString(ansi.NewFormattedString(line))
+	return rw.WriteLineFormattedString(ansi.NewFormattedString(line, new(ansi.Format)))
 }
 
 // Writes [ansi.FormattedString] to the output.

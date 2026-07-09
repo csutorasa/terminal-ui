@@ -6,7 +6,7 @@ import (
 	"github.com/csutorasa/terminal-ui/ansi"
 )
 
-var r = ansi.NewFormattedRune('x', ansi.FormatCodeBold, ansi.FormatCodeRedForeground)
+var r = ansi.NewFormattedRune('x', new(ansi.Format).Bold().ForegroundColor(ansi.FormatColorRed))
 
 func TestFormattedRuneLen(t *testing.T) {
 	assertLen(t, 1, r)

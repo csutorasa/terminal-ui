@@ -8,8 +8,8 @@ import (
 )
 
 var text = ansi.FormattedText{
-	ansi.NewFormattedString([]rune("abc"), ansi.FormatCodeBold, ansi.FormatCodeRedForeground),
-	ansi.NewFormattedString([]rune("xyz"), ansi.FormatCodeItalic, ansi.FormatCodeGreenForeground),
+	ansi.NewFormattedString([]rune("abc"), new(ansi.Format).Bold().ForegroundColor(ansi.FormatColorRed)),
+	ansi.NewFormattedString([]rune("xyz"), new(ansi.Format).Italic().ForegroundColor(ansi.FormatColorGreen)),
 }
 
 func TestFormattedTextLen(t *testing.T) {
@@ -46,7 +46,7 @@ func TestFormattedTextPadRight(t *testing.T) {
 		0x1B, '[', '3', '3', 'm', 'f', 'f', 'f', 0x1B, '[', '0', 'm',
 	})
 
-	padRight := text.PadRight(9, ansi.NewFormattedRune('f', ansi.FormatCodeYellowForeground))
+	padRight := text.PadRight(9, ansi.NewFormattedRune('f', new(ansi.Format).ForegroundColor(ansi.FormatColorYellow)))
 
 	assertLen(t, 9, padRight)
 	assertString(t, expected, padRight.String())
@@ -59,7 +59,7 @@ func TestFormattedTextConcat(t *testing.T) {
 		0x1B, '[', '3', '3', 'm', 'f', 'g', 'h', 0x1B, '[', '0', 'm',
 	})
 
-	concat := text.Concat(ansi.NewFormattedText([]rune("fgh"), ansi.FormatCodeYellowForeground))
+	concat := text.Concat(ansi.NewFormattedText([]rune("fgh"), new(ansi.Format).ForegroundColor(ansi.FormatColorYellow)))
 
 	assertLen(t, 9, concat)
 	assertString(t, expected, concat.String())

@@ -7,7 +7,7 @@ import (
 	"github.com/csutorasa/terminal-ui/ansi"
 )
 
-var s = ansi.NewFormattedString([]rune("abcxyz"), ansi.FormatCodeBold, ansi.FormatCodeRedForeground)
+var s = ansi.NewFormattedString([]rune("abcxyz"), new(ansi.Format).Bold().ForegroundColor(ansi.FormatColorRed))
 
 func TestFormattedStringLen(t *testing.T) {
 	assertLen(t, 6, s)

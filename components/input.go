@@ -11,11 +11,10 @@ import (
 
 type Input struct {
 	*SimpleComponent
-	str         *document.Property[[]rune]
-	cursor      *document.Property[int]
-	foreground  *document.Property[ansi.FormatCode]
-	background  *document.Property[ansi.FormatCode]
-	cursorColor *document.UniqueSliceProperty[ansi.FormatCode]
+	str          *document.Property[[]rune]
+	cursor       *document.Property[int]
+	textFormat   *document.Property[*ansi.Format]
+	cursorFormat *document.Property[*ansi.Format]
 }
 
 func NewInput(element *document.Element) *Input {
@@ -23,30 +22,23 @@ func NewInput(element *document.Element) *Input {
 		SimpleComponent: NewSimpleComponent(element),
 		cursor:          document.AppendState(element, document.NewProperty(0)),
 		str:             document.AppendState(element, document.NewSliceProperty([]rune{})),
-		foreground:      document.AppendState(element, document.NewProperty(ansi.FormatCodeDefaultForeground)),
-		background:      document.AppendState(element, document.NewProperty(ansi.FormatCodeDefaultBackground)),
-		cursorColor:     document.AppendState(element, document.NewUniqueSliceProperty([]ansi.FormatCode{ansi.FormatCodeGreenBackground})),
+		textFormat:      document.AppendState(element, document.NewPropertyFunc(new(ansi.Format), ansi.FormatEquals)),
+		cursorFormat:    document.AppendState(element, document.NewPropertyFunc(new(ansi.Format).BackgroundColor(ansi.FormatColorGreen), ansi.FormatEquals)),
 	}
 }
 
 func (i *Input) ApplyTheme(t *style.Theme) {
-	i.SetForeground(t.InputForeground)
-	i.SetBackground(t.InputBackground)
-	i.SetCursorColor(t.Cursor)
+	i.SetTextFormat(t.Input)
+	i.SetCursorFormat(t.Cursor)
 }
 
-func (i *Input) SetForeground(b ansi.FormatCode) *Input {
-	i.foreground.Set(b)
+func (i *Input) SetTextFormat(f *ansi.Format) *Input {
+	i.textFormat.Set(f)
 	return i
 }
 
-func (i *Input) SetBackground(b ansi.FormatCode) *Input {
-	i.background.Set(b)
-	return i
-}
-
-func (i *Input) SetCursorColor(c []ansi.FormatCode) *Input {
-	i.cursorColor.Set(c)
+func (i *Input) SetCursorFormat(f *ansi.Format) *Input {
+	i.cursorFormat.Set(f)
 	return i
 }
 

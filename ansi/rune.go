@@ -1,38 +1,44 @@
 package ansi
 
 import (
-	"fmt"
 	"io"
 	"slices"
 )
 
 // Immutable ANSI formatted rune
 type FormattedRune struct {
-	r         rune
-	arguments []FormatCode
+	r      rune
+	format *Format
 }
 
-func NewFormattedRune(r rune, arguments ...FormatCode) FormattedRune {
+func NewSimpleRune(r rune) FormattedRune {
+	return NewFormattedRune(r, new(Format))
+}
+
+func NewFormattedRune(r rune, format *Format) FormattedRune {
 	if r == 0 {
 		panic("null character is forbidden")
 	}
+	if format == nil {
+		panic("null format is forbidden")
+	}
 	return FormattedRune{
-		arguments: arguments,
-		r:         r,
+		r:      r,
+		format: format,
 	}
 }
 
 // Creates a [FormattedString] by repeating the [FormattedRune].
 func (s FormattedRune) Repeat(count int) FormattedString {
 	return FormattedString{
-		str:       slices.Repeat([]rune{s.r}, count),
-		arguments: s.arguments,
+		str:    slices.Repeat([]rune{s.r}, count),
+		format: s.format,
 	}
 }
 
 // Creates a [FormattedString] from the [FormattedRune].
 func (s FormattedRune) ToString() FormattedString {
-	return NewFormattedString([]rune{s.r}, s.arguments...)
+	return NewFormattedString([]rune{s.r}, s.format)
 }
 
 // Creates a [FormattedText] from the [FormattedRune].
@@ -52,28 +58,12 @@ func (s FormattedRune) Unformat() string {
 
 // Implements [io.WriterTo], so result can be printed to the terminal.
 func (s FormattedRune) WriteTo(w io.Writer) (int64, error) {
-	total := int64(0)
-	n, err := NewEscapeSequence(CommandFormat, s.arguments...).WriteTo(w)
-	total += n
-	if err != nil {
-		return total, err
-	}
-	n1, err := w.Write(([]byte)(string(s.r)))
-	total += int64(n1)
-	if err != nil {
-		return total, err
-	}
-	n, err = NewEscapeSequence(CommandFormat, string(FormatCodeReset)).WriteTo(w)
-	total += n
-	return total, err
+	return s.format.WriteTo(w, string(s.r))
 }
 
 // Implements [fmt.Stringer], so result can be printed to the terminal.
 func (s FormattedRune) String() string {
-	if len(s.arguments) == 0 {
-		return string(s.r)
-	}
-	return fmt.Sprintf("%s%s%s", NewEscapeSequence(CommandFormat, s.arguments...), string(s.r), NewEscapeSequence(CommandFormat, string(FormatCodeReset)))
+	return s.format.FormatString(string(s.r))
 }
 
 // Returns if the two [FormattedRune]s are equal.
@@ -81,5 +71,5 @@ func FormattedRuneEquals(a FormattedRune, b FormattedRune) bool {
 	if a.r != b.r {
 		return false
 	}
-	return FormatCodesEquals(a.arguments, b.arguments)
+	return FormatEquals(a.format, b.format)
 }

@@ -5,39 +5,33 @@ import (
 )
 
 var DefaultTheme = &Theme{
-	DefaultForeground: ansi.FormatCodeDefaultForeground,
-	DefaultBackground: ansi.FormatCodeDefaultBackground,
-	InputForeground:   ansi.FormatCodeDefaultForeground,
-	InputBackground:   ansi.FormatCodeBlueBackground,
-	Cursor:            []ansi.FormatCode{ansi.FormatCodeWhiteBackground, ansi.FormatCodeBlackForeground},
-	Border:            ansi.NewFormattedRune(' ', ansi.FormatCodeWhiteBackground),
+	Default: new(ansi.Format).Foreground(ansi.DefaultForeground()).Background(ansi.DefaultBackground()),
+	Input:   new(ansi.Format).Foreground(ansi.DefaultForeground()).BackgroundColor(ansi.FormatColorBlue),
+	Cursor:  new(ansi.Format).ForegroundColor(ansi.FormatColorBlack).BackgroundColor(ansi.FormatColorWhite),
+	Border:  ansi.NewFormattedRune(' ', new(ansi.Format).BackgroundColor(ansi.FormatColorWhite)),
 }
 
 var TestTheme = &Theme{
-	DefaultForeground: ansi.FormatCodeRedForeground,
-	DefaultBackground: ansi.FormatCodeBrightMagentaBackground,
-	InputForeground:   ansi.FormatCodeBrightGreenForeground,
-	InputBackground:   ansi.FormatCodeWhiteBackground,
-	Cursor:            []ansi.FormatCode{ansi.FormatCodeGreenBackground},
-	Border:            ansi.NewFormattedRune(' ', ansi.FormatCodeYellowBackground),
+	Default: new(ansi.Format).ForegroundColor(ansi.FormatColorRed).BrightBackgroundColor(ansi.FormatColorMagenta),
+	Input:   new(ansi.Format).BrightForegroundColor(ansi.FormatColorGreen).BackgroundColor(ansi.FormatColorWhite),
+	Cursor:  new(ansi.Format).BackgroundColor(ansi.FormatColorGreen),
+	Border:  ansi.NewFormattedRune(' ', new(ansi.Format).BackgroundColor(ansi.FormatColorYellow)),
 }
 
 // Theme to apply to all components
 type Theme struct {
-	DefaultForeground ansi.FormatCode
-	DefaultBackground ansi.FormatCode
-	InputForeground   ansi.FormatCode
-	InputBackground   ansi.FormatCode
-	Cursor            []ansi.FormatCode
-	Border            ansi.FormattedRune
+	Default *ansi.Format
+	Input   *ansi.Format
+	Cursor  *ansi.Format
+	Border  ansi.FormattedRune
 }
 
 // Create [ansi.FormattedString] with default styling.
 func (t *Theme) CreateString(str []rune) ansi.FormattedString {
-	return ansi.NewFormattedString(str, t.DefaultForeground, t.DefaultBackground)
+	return ansi.NewFormattedString(str, t.Default)
 }
 
 // Create [ansi.FormattedText] with default styling.
 func (t *Theme) CreateText(str []rune) ansi.FormattedText {
-	return ansi.NewFormattedText(str, t.DefaultForeground, t.DefaultBackground)
+	return ansi.NewFormattedText(str, t.Default)
 }

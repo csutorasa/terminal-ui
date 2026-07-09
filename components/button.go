@@ -12,12 +12,11 @@ type ButtonActionHandler = func()
 
 type Button struct {
 	*SimpleComponent
-	keyBinding  ButtonKeyBinding
-	text        *document.Property[string]
-	foreground  *document.Property[ansi.FormatCode]
-	background  *document.Property[ansi.FormatCode]
-	cursorColor *document.UniqueSliceProperty[ansi.FormatCode]
-	onAction    ButtonActionHandler
+	keyBinding   ButtonKeyBinding
+	text         *document.Property[string]
+	textFormat   *document.Property[*ansi.Format]
+	cursorFormat *document.Property[*ansi.Format]
+	onAction     ButtonActionHandler
 }
 
 func NewButton(element *document.Element) *Button {
@@ -25,9 +24,8 @@ func NewButton(element *document.Element) *Button {
 		SimpleComponent: NewSimpleComponent(element),
 		keyBinding:      DefaultButtonKeyBinding,
 		text:            document.AppendState(element, document.NewProperty("")),
-		foreground:      document.AppendState(element, document.NewProperty(ansi.FormatCodeDefaultForeground)),
-		background:      document.AppendState(element, document.NewProperty(ansi.FormatCodeDefaultBackground)),
-		cursorColor:     document.AppendState(element, document.NewUniqueSliceProperty([]ansi.FormatCode{ansi.FormatCodeGreenBackground})),
+		textFormat:      document.AppendState(element, document.NewPropertyFunc(new(ansi.Format), ansi.FormatEquals)),
+		cursorFormat:    document.AppendState(element, document.NewPropertyFunc(new(ansi.Format).BackgroundColor(ansi.FormatColorGreen), ansi.FormatEquals)),
 	}
 }
 
@@ -36,23 +34,17 @@ func (c *Creator) NewButton() *Button {
 }
 
 func (b *Button) ApplyTheme(t *style.Theme) {
-	b.SetForeground(t.InputForeground)
-	b.SetBackground(t.InputBackground)
-	b.SetCursorColor(t.Cursor)
+	b.SetTextFormat(t.Input)
+	b.SetCursorFormat(t.Cursor)
 }
 
-func (b *Button) SetForeground(c ansi.FormatCode) *Button {
-	b.foreground.Set(c)
+func (b *Button) SetTextFormat(f *ansi.Format) *Button {
+	b.textFormat.Set(f)
 	return b
 }
 
-func (b *Button) SetBackground(c ansi.FormatCode) *Button {
-	b.background.Set(c)
-	return b
-}
-
-func (b *Button) SetCursorColor(c []ansi.FormatCode) *Button {
-	b.cursorColor.Set(c)
+func (b *Button) SetCursorFormat(f *ansi.Format) *Button {
+	b.cursorFormat.Set(f)
 	return b
 }
 
@@ -74,11 +66,11 @@ func (b *Button) Render(c *document.RenderWriter) {
 	text := b.text.Value()
 	for line := range strings.SplitSeq(text, "\n") {
 		if b.Focused() {
-			if !c.WriteLineFormattedString(ansi.NewFormattedString([]rune(line), b.cursorColor.Value()...)) {
+			if !c.WriteLineFormattedString(ansi.NewFormattedString([]rune(line), b.cursorFormat.Value())) {
 				return
 			}
 		} else {
-			if !c.WriteLineFormattedString(ansi.NewFormattedString([]rune(line), b.background.Value(), b.foreground.Value())) {
+			if !c.WriteLineFormattedString(ansi.NewFormattedString([]rune(line), b.textFormat.Value())) {
 				return
 			}
 		}

@@ -8,7 +8,7 @@ import (
 
 type Border struct {
 	*WrapperComponent
-	background *document.Property[ansi.FormatCode]
+	background *document.Property[*ansi.Format]
 	border     *document.Property[ansi.FormattedRune]
 	thickness  *document.Property[int]
 }
@@ -16,9 +16,9 @@ type Border struct {
 func NewBorder(element *document.Element) *Border {
 	return &Border{
 		WrapperComponent: NewWrapperComponent(element),
-		border:           document.AppendState(element, document.NewPropertyFunc(ansi.NewFormattedRune('*'), ansi.FormattedRuneEquals)),
+		border:           document.AppendState(element, document.NewPropertyFunc(ansi.NewSimpleRune('*'), ansi.FormattedRuneEquals)),
 		thickness:        document.AppendState(element, document.NewProperty(1)),
-		background:       document.AppendState(element, document.NewProperty(ansi.FormatCodeDefaultBackground)),
+		background:       document.AppendState(element, document.NewPropertyFunc(new(ansi.Format), ansi.FormatEquals)),
 	}
 }
 
@@ -28,7 +28,7 @@ func (c *Creator) NewBorder() *Border {
 
 func (b *Border) ApplyTheme(t *style.Theme) {
 	b.SetBorder(t.Border)
-	b.SetBackground(t.DefaultBackground)
+	b.SetBackground(t.Default)
 }
 
 func (b *Border) SetBorder(border ansi.FormattedRune) *Border {
@@ -36,7 +36,7 @@ func (b *Border) SetBorder(border ansi.FormattedRune) *Border {
 	return b
 }
 
-func (b *Border) SetBackground(background ansi.FormatCode) *Border {
+func (b *Border) SetBackground(background *ansi.Format) *Border {
 	b.background.Set(background)
 	return b
 }

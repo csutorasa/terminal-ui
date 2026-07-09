@@ -10,8 +10,12 @@ import (
 // ANSI formatted text
 type FormattedText []FormattedString
 
-func NewFormattedText(str []rune, arguments ...FormatCode) FormattedText {
-	return FormattedText{NewFormattedString(str, arguments...)}
+func NewSimpleText(str []rune) FormattedText {
+	return NewFormattedText(str, new(Format))
+}
+
+func NewFormattedText(str []rune, format *Format) FormattedText {
+	return FormattedText{NewFormattedString(str, format)}
 }
 
 // Returns the substring of the [FormattedText].

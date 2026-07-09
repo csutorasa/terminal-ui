@@ -12,7 +12,7 @@ type Grid struct {
 	*ContainerComponent
 	columns    *document.Property[[]*gridSize]
 	rows       *document.Property[[]*gridSize]
-	background *document.Property[ansi.FormatCode]
+	background *document.Property[*ansi.Format]
 }
 
 func NewGrid(element *document.Element) *Grid {
@@ -20,7 +20,7 @@ func NewGrid(element *document.Element) *Grid {
 		ContainerComponent: NewContainerComponent(element),
 		columns:            document.NewSliceProperty([]*gridSize{}),
 		rows:               document.NewSliceProperty([]*gridSize{}),
-		background:         document.AppendState(element, document.NewProperty(ansi.FormatCodeDefaultBackground)),
+		background:         document.AppendState(element, document.NewPropertyFunc(new(ansi.Format), ansi.FormatEquals)),
 	}
 }
 
@@ -29,11 +29,11 @@ func (c *Creator) NewGrid() *Grid {
 }
 
 func (g *Grid) ApplyTheme(t *style.Theme) {
-	g.SetBackground(t.DefaultBackground)
+	g.SetBackground(t.Default)
 }
 
-func (g *Grid) SetBackground(background ansi.FormatCode) *Grid {
-	g.background.Set(background)
+func (g *Grid) SetBackground(f *ansi.Format) *Grid {
+	g.background.Set(f)
 	return g
 }
 

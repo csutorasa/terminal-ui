@@ -1,7 +1,6 @@
 package ansi
 
 import (
-	"fmt"
 	"io"
 	"iter"
 	"slices"
@@ -10,14 +9,18 @@ import (
 
 // Immutable ANSI formatted string
 type FormattedString struct {
-	str       []rune
-	arguments []FormatCode
+	str    []rune
+	format *Format
 }
 
-func NewFormattedString(str []rune, arguments ...FormatCode) FormattedString {
+func NewSimpleString(str []rune) FormattedString {
+	return NewFormattedString(str, new(Format))
+}
+
+func NewFormattedString(str []rune, format *Format) FormattedString {
 	return FormattedString{
-		arguments: arguments,
-		str:       str,
+		str:    str,
+		format: format,
 	}
 }
 
@@ -26,8 +29,8 @@ func (s FormattedString) SplitSeq(sep string) iter.Seq[FormattedString] {
 	return func(yield func(FormattedString) bool) {
 		for line := range strings.SplitSeq(string(s.str), sep) {
 			str := FormattedString{
-				str:       []rune(line),
-				arguments: s.arguments,
+				str:    []rune(line),
+				format: s.format,
 			}
 			if !yield(str) {
 				return
@@ -50,8 +53,8 @@ func (s FormattedString) RunesSeq() iter.Seq[rune] {
 // Returns the substring of the [FormattedString].
 func (s FormattedString) SubStr(from int, to int) FormattedString {
 	return FormattedString{
-		str:       s.str[from:to],
-		arguments: s.arguments,
+		str:    s.str[from:to],
+		format: s.format,
 	}
 }
 
@@ -72,38 +75,12 @@ func (s FormattedString) Unformat() string {
 
 // Implements [io.WriterTo], so result can be printed to the terminal.
 func (s FormattedString) WriteTo(w io.Writer) (int64, error) {
-	if len(s.str) == 0 {
-		return 0, nil
-	}
-	if len(s.arguments) == 0 {
-		n, err := w.Write(([]byte)(string(s.str)))
-		return int64(n), err
-	}
-	total := int64(0)
-	n, err := NewEscapeSequence(CommandFormat, s.arguments...).WriteTo(w)
-	total += n
-	if err != nil {
-		return total, err
-	}
-	n1, err := w.Write(([]byte)(string(s.str)))
-	total += int64(n1)
-	if err != nil {
-		return total, err
-	}
-	n, err = NewEscapeSequence(CommandFormat, string(FormatCodeReset)).WriteTo(w)
-	total += n
-	return total, err
+	return s.format.WriteTo(w, string(s.str))
 }
 
 // Implements [fmt.Stringer], so result can be printed to the terminal.
 func (s FormattedString) String() string {
-	if len(s.str) == 0 {
-		return ""
-	}
-	if len(s.arguments) == 0 {
-		return string(s.str)
-	}
-	return fmt.Sprintf("%s%s%s", NewEscapeSequence(CommandFormat, s.arguments...), string(s.str), NewEscapeSequence(CommandFormat, string(FormatCodeReset)))
+	return s.format.FormatString(string(s.str))
 }
 
 // Returns if the two [FormattedString]s are equal.
@@ -111,5 +88,5 @@ func FormattedStringEquals(a FormattedString, b FormattedString) bool {
 	if !slices.Equal(a.str, b.str) {
 		return false
 	}
-	return FormatCodesEquals(a.arguments, b.arguments)
+	return FormatEquals(a.format, b.format)
 }
