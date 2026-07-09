@@ -12,7 +12,7 @@ type Grid struct {
 	*ContainerComponent
 	columns    *document.Property[[]*gridSize]
 	rows       *document.Property[[]*gridSize]
-	background *document.Property[*ansi.Format]
+	background *document.Property[ansi.FormattedRune]
 }
 
 func NewGrid(element *document.Element) *Grid {
@@ -20,7 +20,7 @@ func NewGrid(element *document.Element) *Grid {
 		ContainerComponent: NewContainerComponent(element),
 		columns:            document.NewSliceProperty([]*gridSize{}),
 		rows:               document.NewSliceProperty([]*gridSize{}),
-		background:         document.AppendState(element, document.NewPropertyFunc(new(ansi.Format), ansi.FormatEquals)),
+		background:         document.AppendState(element, document.NewPropertyFunc(ansi.NewSimpleRune(' '), ansi.FormattedRuneEquals)),
 	}
 }
 
@@ -29,11 +29,11 @@ func (c *Creator) NewGrid() *Grid {
 }
 
 func (g *Grid) ApplyTheme(t *style.Theme) {
-	g.SetBackground(t.Default)
+	g.SetBackground(t.Background)
 }
 
-func (g *Grid) SetBackground(f *ansi.Format) *Grid {
-	g.background.Set(f)
+func (g *Grid) SetBackground(r ansi.FormattedRune) *Grid {
+	g.background.Set(r)
 	return g
 }
 
@@ -120,7 +120,7 @@ func (g *Grid) Render(c *document.RenderWriter) {
 				if i >= len(children) {
 					continue
 				}
-				childLines = append(childLines, children[i].RenderFill(ansi.NewFormattedRune(' ', g.background.Value())))
+				childLines = append(childLines, children[i].RenderFill(g.background.Value()))
 				i++
 			}
 			for i := range height {

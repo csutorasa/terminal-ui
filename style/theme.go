@@ -5,25 +5,28 @@ import (
 )
 
 var DefaultTheme = &Theme{
-	Default: new(ansi.Format).Foreground(ansi.DefaultForeground()).Background(ansi.DefaultBackground()),
-	Input:   new(ansi.Format).Foreground(ansi.DefaultForeground()).BackgroundColor(ansi.FormatColorBlue),
-	Cursor:  new(ansi.Format).ForegroundColor(ansi.FormatColorBlack).BackgroundColor(ansi.FormatColorWhite),
-	Border:  ansi.NewFormattedRune(' ', new(ansi.Format).BackgroundColor(ansi.FormatColorWhite)),
+	Default:    new(ansi.Format).Foreground(ansi.DefaultForeground()).Background(ansi.DefaultBackground()),
+	Input:      new(ansi.Format).Foreground(ansi.DefaultForeground()).BackgroundColor(ansi.FormatColorBlue),
+	Cursor:     new(ansi.Format).ForegroundColor(ansi.FormatColorBlack).BackgroundColor(ansi.FormatColorWhite),
+	Background: ansi.NewFormattedRune(' ', new(ansi.Format).Background(ansi.DefaultBackground())),
+	Border:     ansi.NewFormattedRune(' ', new(ansi.Format).BackgroundColor(ansi.FormatColorWhite)),
 }
 
 var TestTheme = &Theme{
-	Default: new(ansi.Format).ForegroundColor(ansi.FormatColorRed).BrightBackgroundColor(ansi.FormatColorMagenta),
-	Input:   new(ansi.Format).BrightForegroundColor(ansi.FormatColorGreen).BackgroundColor(ansi.FormatColorWhite),
-	Cursor:  new(ansi.Format).BackgroundColor(ansi.FormatColorGreen),
-	Border:  ansi.NewFormattedRune(' ', new(ansi.Format).BackgroundColor(ansi.FormatColorYellow)),
+	Default:    new(ansi.Format).ForegroundColor(ansi.FormatColorRed).BrightBackgroundColor(ansi.FormatColorMagenta),
+	Input:      new(ansi.Format).BrightForegroundColor(ansi.FormatColorGreen).BackgroundColor(ansi.FormatColorWhite),
+	Cursor:     new(ansi.Format).BackgroundColor(ansi.FormatColorGreen),
+	Background: ansi.NewFormattedRune(' ', new(ansi.Format).BrightBackgroundColor(ansi.FormatColorMagenta)),
+	Border:     ansi.NewFormattedRune(' ', new(ansi.Format).BackgroundColor(ansi.FormatColorYellow)),
 }
 
 // Theme to apply to all components
 type Theme struct {
-	Default *ansi.Format
-	Input   *ansi.Format
-	Cursor  *ansi.Format
-	Border  ansi.FormattedRune
+	Default    *ansi.Format
+	Input      *ansi.Format
+	Cursor     *ansi.Format
+	Background ansi.FormattedRune
+	Border     ansi.FormattedRune
 }
 
 // Create [ansi.FormattedString] with default styling.
