@@ -14,10 +14,10 @@ import (
 func main() {
 	//c := components.NewDefaultCreator()
 	c := components.NewCreator(document.Default, style.DefaultTheme)
-	text := c.NewText()
+	text := c.NewRichText()
 	text.SetText(ansi.NewFormattedText([]rune("hello\n"), new(ansi.Format).ForegroundColor(ansi.FormatColorGreen)).Concat(ansi.NewFormattedText([]rune("world\ntest"), new(ansi.Format))))
 	text2 := c.NewText()
-	text2.SetText(c.Theme().CreateText([]rune("hello2\nworld\ntest")))
+	text2.SetText("hello2\nworld\ntest")
 	textInput := c.NewTextInput()
 	textInput2 := c.NewTextInput()
 	border2 := c.NewBorder()
