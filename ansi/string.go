@@ -18,6 +18,9 @@ func NewSimpleString(str []rune) FormattedString {
 }
 
 func NewFormattedString(str []rune, format *Format) FormattedString {
+	for _, r := range str {
+		ValidateRune(r)
+	}
 	return FormattedString{
 		str:    str,
 		format: format,

@@ -42,10 +42,6 @@ func (b *Border) SetBackground(background ansi.FormattedRune) *Border {
 }
 
 func (b *Border) SetThickness(thickness style.Directional[uint8]) *Border {
-	left, top, right, bottom := thickness.Get()
-	if left < 0 || top < 0 || right < 0 || bottom < 0 {
-		panic("thickness must not be negative")
-	}
 	b.thickness.Set(thickness)
 	return b
 }

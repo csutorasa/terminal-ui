@@ -75,12 +75,14 @@ func (e *Element) render() bool {
 }
 
 func (e *Element) renderLayout(c LayoutContext) {
-	c.setCurrentParent(e)
-	e.component.Layout(c)
+	if !c.Empty() {
+		c.setCurrentParent(e)
+		e.component.Layout(c)
+	}
 	for _, child := range e.properties.children.Value() {
 		cl, ok := c.layout[child]
 		if !ok {
-			panic("not found")
+			cl = NewEmptyRenderContext()
 		}
 		ctx := NewLayoutContext(cl)
 		ctx.layout = c.layout

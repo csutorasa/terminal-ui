@@ -33,6 +33,11 @@ func (rc *RenderContext) Size() (int, int) {
 	return rc.w, rc.h
 }
 
+// Gets if [RenderContext] is empty.
+func (rc *RenderContext) Empty() bool {
+	return rc.w < 1 || rc.h < 1
+}
+
 // Layout calculation context.
 type LayoutContext struct {
 	RenderContext
@@ -57,10 +62,6 @@ func (lc LayoutContext) Add(e *Element, rc RenderContext) {
 }
 
 func (lc LayoutContext) add(e *Element, rc RenderContext) {
-	_, ok := lc.layout[e]
-	if ok {
-		panic("element layout already exists")
-	}
 	lc.layout[e] = rc
 }
 

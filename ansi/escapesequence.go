@@ -10,7 +10,7 @@ type EscapeSequence string
 
 func NewEscapeSequence(command Command, arguments ...string) EscapeSequence {
 	if command == "" {
-		panic("command cannot be empty")
+		panic("empty command")
 	}
 	var sb strings.Builder
 	sb.WriteString("\033[")

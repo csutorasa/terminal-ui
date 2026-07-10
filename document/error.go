@@ -12,3 +12,6 @@ var ErrDocumentMismatch error = fmt.Errorf("document mismatch")
 
 // Error that happens when the document has a corrupted DOM.
 var ErrCorruptDom error = fmt.Errorf("dom is corrupt")
+
+// Error that happens when invalid operation is attempted on an infinite sized [RenderContext].
+var ErrInfiniteRenderContext error = fmt.Errorf("infinite render context")
